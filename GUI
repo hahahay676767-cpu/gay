@@ -1,5 +1,5 @@
 -- ============================================================
--- JinHub NEW GUI v2.0
+-- JinHub NEW GUI v2.1
 -- ============================================================
 
 local CoreGui = game:GetService("CoreGui")
@@ -704,15 +704,9 @@ local function updateTargetLabel()
     local wheatCount = State.target.wheatPlant or 0
     local fridgeCount = State.target.rustyFridge or 0
     
-    -- DEBUG: Log check
-    local step = getgenv().KaitunCurrentStep
-    local progress = getgenv().KaitunFarmingProgress
-    print(string.format("[GUI DEBUG] updateTargetLabel: Step=%s, Progress=%s", tostring(step), tostring(progress)))
-    
     -- v4.6: At Step 3+, show Total Harvest Progress (Farming Milestone)
     if getgenv().KaitunCurrentStep and getgenv().KaitunCurrentStep >= 3 then
         local cropsHarvested = getgenv().KaitunFarmingProgress or 0
-        print(string.format("[GUI DEBUG] Step 3+ detected! Showing harvest total: %s", tostring(cropsHarvested)))
         TargetLabel.Text = string.format(
             '<font color="#FEF08A">Harvest Total:</font>   <font color="#86EFAC"><b>%s / 400,000 Crops!</b></font>',
             formatNumber(cropsHarvested)
@@ -720,7 +714,6 @@ local function updateTargetLabel()
         return
     end
     
-    print(string.format("[GUI DEBUG] Step 1-2, showing wheat/fridge: Wheat=%d, Fridge=%d", wheatCount, fridgeCount))
     TargetLabel.Text = string.format(
         '<font color="#FEF08A">Target:</font>   <font color="#FFFFFF"><b>Wheat Plant</b></font> <font color="#FEF08A">x%d</font>   <font color="#FACC15">|</font>   <font color="#FFFFFF"><b>Basic Fridge</b></font> <font color="#FEF08A">x%d</font>',
         wheatCount,
@@ -732,13 +725,11 @@ updateTargetLabel()
 local function refreshTargetState()
     -- Skip wheat/fridge update if in Step 3+ (show farming progress instead)
     if getgenv().KaitunCurrentStep and getgenv().KaitunCurrentStep >= 3 then
-        print(string.format("[GUI DEBUG] refreshTargetState: Step 3+ detected (%s), calling updateTargetLabel directly", tostring(getgenv().KaitunCurrentStep)))
         -- Just update the label (will show farming progress)
         updateTargetLabel()
         return
     end
     
-    print("[GUI DEBUG] refreshTargetState: Step 1-2, updating wheat/fridge counts")
     State.target = {
         wheatPlant = getItemCount("Wheat Plant"),
         rustyFridge = getItemCount("Basic Fridge"),
