@@ -1,5 +1,5 @@
 -- ============================================================
--- JinHub NEW GUI v2.0
+-- JinHub NEW GUI v2.1
 -- ============================================================
 
 local CoreGui = game:GetService("CoreGui")
@@ -723,6 +723,13 @@ end
 updateTargetLabel()
 
 local function refreshTargetState()
+    -- Skip wheat/fridge update if in Step 3+ (show farming progress instead)
+    if getgenv().KaitunCurrentStep and getgenv().KaitunCurrentStep >= 3 then
+        -- Just update the label (will show farming progress)
+        updateTargetLabel()
+        return
+    end
+    
     State.target = {
         wheatPlant = getItemCount("Wheat Plant"),
         rustyFridge = getItemCount("Basic Fridge"),
