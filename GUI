@@ -1,5 +1,5 @@
 -- ============================================================
--- JinHub NEW GUI v2.1
+-- JinHub NEW GUI v2.2
 -- ============================================================
 
 local CoreGui = game:GetService("CoreGui")
@@ -705,15 +705,19 @@ local function updateTargetLabel()
     local fridgeCount = State.target.rustyFridge or 0
     
     -- v4.6: At Step 3+, show Total Harvest Progress (Farming Milestone)
-    if getgenv().KaitunCurrentStep and getgenv().KaitunCurrentStep >= 3 then
-        local cropsHarvested = getgenv().KaitunFarmingProgress or 0
+    local currentStep = getgenv().KaitunCurrentStep
+    local farmingProgress = getgenv().KaitunFarmingProgress
+    
+    if currentStep and currentStep >= 3 and farmingProgress then
+        -- Step 3+: Show Harvest Total
         TargetLabel.Text = string.format(
             '<font color="#FEF08A">Harvest Total:</font>   <font color="#86EFAC"><b>%s / 400,000 Crops!</b></font>',
-            formatNumber(cropsHarvested)
+            formatNumber(farmingProgress)
         )
         return
     end
     
+    -- Step 1-2: Show Wheat Plant + Rusty Fridge target
     TargetLabel.Text = string.format(
         '<font color="#FEF08A">Target:</font>   <font color="#FFFFFF"><b>Wheat Plant</b></font> <font color="#FEF08A">x%d</font>   <font color="#FACC15">|</font>   <font color="#FFFFFF"><b>Basic Fridge</b></font> <font color="#FEF08A">x%d</font>',
         wheatCount,
@@ -723,13 +727,6 @@ end
 updateTargetLabel()
 
 local function refreshTargetState()
-    -- Skip wheat/fridge update if in Step 3+ (show farming progress instead)
-    if getgenv().KaitunCurrentStep and getgenv().KaitunCurrentStep >= 3 then
-        -- Just update the label (will show farming progress)
-        updateTargetLabel()
-        return
-    end
-    
     State.target = {
         wheatPlant = getItemCount("Wheat Plant"),
         rustyFridge = getItemCount("Basic Fridge"),
