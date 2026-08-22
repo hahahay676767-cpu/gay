@@ -1,5 +1,5 @@
 -- ============================================================
--- JinHub NEW GUI v2.2
+-- JinHub NEW GUI v2.3
 -- ============================================================
 
 local CoreGui = game:GetService("CoreGui")
@@ -707,6 +707,11 @@ local function updateTargetLabel()
     -- v4.6: At Step 3+, show Total Harvest Progress (Farming Milestone)
     local currentStep = getgenv().KaitunCurrentStep
     local farmingProgress = getgenv().KaitunFarmingProgress
+    
+    -- DEBUG: Print values untuk troubleshooting
+    if currentStep and currentStep >= 3 then
+        print(string.format("[GUI DEBUG] updateTargetLabel: Step=%s, Progress=%s", tostring(currentStep), tostring(farmingProgress)))
+    end
     
     if currentStep and currentStep >= 3 and farmingProgress then
         -- Step 3+: Show Harvest Total
