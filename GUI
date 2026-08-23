@@ -1,5 +1,5 @@
 -- ============================================================
--- JinHub NEW GUI v2.7
+-- JinHub NEW GUI v2.8
 -- ============================================================
 
 local CoreGui = game:GetService("CoreGui")
@@ -701,28 +701,54 @@ TargetLabel.Parent = MainFrame
 State.target = State.target or {}
 
 local function updateTargetLabel(farmingProgressParam)
-    -- v4.9: Always show Harvest xx / 400,000 Crops! — no more Wheat Plant / Fridge text
-    local current = 0
+    -- v5.0: Step 3+ -> Harvest xx/400,000 | Step 1-2 -> Wheat Plant / Basic Fridge count
+    local isFarmingStep = (type(getgenv().KaitunCurrentStep) == "number" and getgenv().KaitunCurrentStep >= 3)
+        or (State.activeQuest and type(State.activeQuest) == "string" and State.activeQuest:find("FARMING") ~= nil)
 
-    -- Prefer the live cumulative counter set by kaitun-FINAL.lua (most accurate)
-    if type(getgenv().KaitunFarmingProgress) == "number" then
-        current = getgenv().KaitunFarmingProgress
-    elseif State.activeQuest and type(State.activeQuest) == "string" then
-        -- Fallback: extract from Active Quest text, e.g. "FARMING 2 | Harvest 20,738/25,000 Crops!"
-        local match = State.activeQuest:match("Harvest ([%d,]+)/")
-        if match then
-            current = tonumber((match:gsub(",", ""))) or 0
+    if isFarmingStep then
+        local current = 0
+
+        -- Prefer the live cumulative counter set by kaitun-FINAL.lua (most accurate)
+        if type(getgenv().KaitunFarmingProgress) == "number" then
+            current = getgenv().KaitunFarmingProgress
+        elseif State.activeQuest and type(State.activeQuest) == "string" then
+            -- Fallback: extract from Active Quest text, e.g. "FARMING 2 | Harvest 20,738/25,000 Crops!"
+            local match = State.activeQuest:match("Harvest ([%d,]+)/")
+            if match then
+                current = tonumber((match:gsub(",", ""))) or 0
+            end
         end
+
+        TargetLabel.Text = string.format(
+            '<font color="#FEF08A">Target:</font>   <font color="#86EFAC"><b>Harvest %s / 400,000 Crops!</b></font>',
+            formatNumber(current)
+        )
+        return
     end
 
+    -- Step 1-2: Show wheat/fridge target
+    local wheatCount = State.target.wheatPlant or 0
+    local fridgeCount = State.target.rustyFridge or 0
+
     TargetLabel.Text = string.format(
-        '<font color="#FEF08A">Target:</font>   <font color="#86EFAC"><b>Harvest %s / 400,000 Crops!</b></font>',
-        formatNumber(current)
+        '<font color="#FEF08A">Target:</font>   <font color="#FFFFFF"><b>Wheat Plant</b></font> <font color="#FEF08A">x%d</font>   <font color="#FACC15">|</font>   <font color="#FFFFFF"><b>Basic Fridge</b></font> <font color="#FEF08A">x%d</font>',
+        wheatCount,
+        fridgeCount
     )
 end
 updateTargetLabel()
 
 local function refreshTargetState()
+    -- Skip wheat/fridge lookup once Step 3+ (harvest progress takes over)
+    if type(getgenv().KaitunCurrentStep) == "number" and getgenv().KaitunCurrentStep >= 3 then
+        updateTargetLabel()
+        return
+    end
+
+    State.target = {
+        wheatPlant = getItemCount("Wheat Plant"),
+        rustyFridge = getItemCount("Basic Fridge"),
+    }
     updateTargetLabel()
 end
 refreshTargetState()
