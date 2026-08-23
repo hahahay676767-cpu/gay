@@ -1,5 +1,5 @@
 -- ============================================================
--- JinHub NEW GUI v2.3
+-- JinHub NEW GUI v2.4
 -- ============================================================
 
 local CoreGui = game:GetService("CoreGui")
@@ -713,8 +713,8 @@ local function updateTargetLabel()
         print(string.format("[GUI DEBUG] updateTargetLabel: Step=%s, Progress=%s", tostring(currentStep), tostring(farmingProgress)))
     end
     
-    if currentStep and currentStep >= 3 and farmingProgress then
-        -- Step 3+: Show Harvest Total
+    if currentStep and currentStep >= 3 and farmingProgress ~= nil then
+        -- Step 3+: Show Harvest Total (farmingProgress can be 0!)
         TargetLabel.Text = string.format(
             '<font color="#FEF08A">Harvest Total:</font>   <font color="#86EFAC"><b>%s / 400,000 Crops!</b></font>',
             formatNumber(farmingProgress)
