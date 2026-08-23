@@ -1,5 +1,5 @@
 -- ============================================================
--- JinHub NEW GUI v2.5
+-- JinHub NEW GUI v2.3
 -- ============================================================
 
 local CoreGui = game:GetService("CoreGui")
@@ -713,8 +713,8 @@ local function updateTargetLabel()
         print(string.format("[GUI DEBUG] updateTargetLabel: Step=%s, Progress=%s", tostring(currentStep), tostring(farmingProgress)))
     end
     
-    if currentStep and currentStep >= 3 and farmingProgress ~= nil then
-        -- Step 3+: Show Harvest Total (farmingProgress can be 0!)
+    if currentStep and currentStep >= 3 and farmingProgress then
+        -- Step 3+: Show Harvest Total
         TargetLabel.Text = string.format(
             '<font color="#FEF08A">Harvest Total:</font>   <font color="#86EFAC"><b>%s / 400,000 Crops!</b></font>',
             formatNumber(farmingProgress)
@@ -732,6 +732,13 @@ end
 updateTargetLabel()
 
 local function refreshTargetState()
+    -- Skip wheat/fridge update if in Step 3+ (show farming progress instead)
+    if getgenv().KaitunCurrentStep and getgenv().KaitunCurrentStep >= 3 then
+        -- Just update the label (will show farming progress)
+        updateTargetLabel()
+        return
+    end
+    
     State.target = {
         wheatPlant = getItemCount("Wheat Plant"),
         rustyFridge = getItemCount("Basic Fridge"),
@@ -1028,8 +1035,12 @@ FarmBtnStroke.Parent = FarmBtn
 -- Default state: farming = true (auto-start)
 State.farming = true
 
--- Button click handler will be overridden by kaitun script
--- DO NOT add MouseButton1Click connection here - kaitun script will handle it
+-- Button click handler akan di-override oleh kaitun script
+FarmBtn.MouseButton1Click:Connect(function()
+    State.farming = not State.farming
+    FarmBtn.Text = State.farming and "STOP AUTO FARM" or "START AUTO FARM"
+    FarmBtn.BackgroundColor3 = State.farming and Color3.fromRGB(225, 29, 72) or Color3.fromRGB(234, 179, 8)
+end)
 
 -- Tombol Disable 3D — beneran nurunin quality rendering (bukan cuma toggle teks)
 local Disable3DBtn, Disable3DStroke = createSubButton(
@@ -1037,8 +1048,12 @@ local Disable3DBtn, Disable3DStroke = createSubButton(
     "Disable 3D: OFF"
 )
 
--- Button click handler will be overridden by kaitun script
--- DO NOT add MouseButton1Click connection here - kaitun script will handle it
+-- Button click handler akan di-override oleh kaitun script
+Disable3DBtn.MouseButton1Click:Connect(function()
+    State.disable3D = not State.disable3D
+    Disable3DBtn.Text = "Disable 3D: " .. (State.disable3D and "ON" or "OFF")
+    pcall(setLowRenderMode, State.disable3D)
+end)
 
 -- Webhook input (cuma nyimpen teks lokal, gak ada pengiriman apapun)
 local WebhookContainer = Instance.new("Frame")
