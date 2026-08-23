@@ -1,5 +1,5 @@
 -- ============================================================
--- JinHub NEW GUI v2.4
+-- JinHub NEW GUI v2.5
 -- ============================================================
 
 local CoreGui = game:GetService("CoreGui")
@@ -701,16 +701,23 @@ TargetLabel.Parent = MainFrame
 State.target = State.target or {}
 
 local function updateTargetLabel(farmingProgressParam)
-    -- v4.6: If called with parameter (farming progress), show harvest total
-    if farmingProgressParam then
-        TargetLabel.Text = string.format(
-            '<font color="#FEF08A">Harvest Total:</font>   <font color="#86EFAC"><b>%s / 400,000 Crops!</b></font>',
-            formatNumber(farmingProgressParam)
-        )
-        return
+    -- v4.7: Simple solution - extract from Active Quest if Step 3
+    if State.activeQuest and type(State.activeQuest) == "string" and State.activeQuest:find("FARMING") then
+        -- Extract current progress from Active Quest text
+        -- Format: "FARMING 2 | Harvest 20,738/25,000 Crops!"
+        local current = State.activeQuest:match("Harvest ([%d,]+)/")
+        if current then
+            -- Remove comma for display
+            current = current:gsub(",", "")
+            TargetLabel.Text = string.format(
+                '<font color="#FEF08A">Target:</font>   <font color="#86EFAC"><b>%s / 400,000 Crops!</b></font>',
+                formatNumber(tonumber(current) or 0)
+            )
+            return
+        end
     end
     
-    -- Normal mode: Show wheat/fridge target
+    -- Step 1-2: Show wheat/fridge target
     local wheatCount = State.target.wheatPlant or 0
     local fridgeCount = State.target.rustyFridge or 0
     
