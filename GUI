@@ -1,5 +1,5 @@
 -- ============================================================
--- JinHub NEW GUI v2.5
+-- JinHub NEW GUI v2.6
 -- ============================================================
 
 local CoreGui = game:GetService("CoreGui")
@@ -788,6 +788,10 @@ local function updateActiveQuestLabel(questText)
         '<font color="#FEF08A">Active Quest:</font>   <font color="#FFFFFF"><b>%s</b></font>',
         tostring(State.activeQuest)
     )
+    
+    -- v4.8: Update Target label SETIAP KALI Active Quest berubah
+    -- Jadi Target label SELALU sinkron dengan Active Quest
+    updateTargetLabel()
 end
 updateActiveQuestLabel()
 
