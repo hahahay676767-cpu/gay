@@ -1,5 +1,5 @@
 -- ============================================================
--- JinHub NEW GUI v2.8
+-- JinHub NEW GUI v2.9
 -- ============================================================
 
 local CoreGui = game:GetService("CoreGui")
@@ -284,6 +284,7 @@ local State = {
     activeQuest = "-",
     cpm = "-",
     fridge = "-",
+    LoopToken = 0,  -- Token-based loop cancellation
 }
 
 local function formatNumber(n)
