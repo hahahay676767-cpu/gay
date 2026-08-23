@@ -1,5 +1,5 @@
 -- ============================================================
--- JinHub NEW GUI v2.3
+-- JinHub NEW GUI v2.4
 -- ============================================================
 
 local CoreGui = game:GetService("CoreGui")
@@ -700,29 +700,20 @@ TargetLabel.Parent = MainFrame
 -- State.target sekarang di-drive dari jumlah item asli di inventory player
 State.target = State.target or {}
 
-local function updateTargetLabel()
-    local wheatCount = State.target.wheatPlant or 0
-    local fridgeCount = State.target.rustyFridge or 0
-    
-    -- v4.6: At Step 3+, show Total Harvest Progress (Farming Milestone)
-    local currentStep = getgenv().KaitunCurrentStep
-    local farmingProgress = getgenv().KaitunFarmingProgress
-    
-    -- DEBUG: Print values untuk troubleshooting
-    if currentStep and currentStep >= 3 then
-        print(string.format("[GUI DEBUG] updateTargetLabel: Step=%s, Progress=%s", tostring(currentStep), tostring(farmingProgress)))
-    end
-    
-    if currentStep and currentStep >= 3 and farmingProgress then
-        -- Step 3+: Show Harvest Total
+local function updateTargetLabel(farmingProgressParam)
+    -- v4.6: If called with parameter (farming progress), show harvest total
+    if farmingProgressParam then
         TargetLabel.Text = string.format(
             '<font color="#FEF08A">Harvest Total:</font>   <font color="#86EFAC"><b>%s / 400,000 Crops!</b></font>',
-            formatNumber(farmingProgress)
+            formatNumber(farmingProgressParam)
         )
         return
     end
     
-    -- Step 1-2: Show Wheat Plant + Rusty Fridge target
+    -- Normal mode: Show wheat/fridge target
+    local wheatCount = State.target.wheatPlant or 0
+    local fridgeCount = State.target.rustyFridge or 0
+    
     TargetLabel.Text = string.format(
         '<font color="#FEF08A">Target:</font>   <font color="#FFFFFF"><b>Wheat Plant</b></font> <font color="#FEF08A">x%d</font>   <font color="#FACC15">|</font>   <font color="#FFFFFF"><b>Basic Fridge</b></font> <font color="#FEF08A">x%d</font>',
         wheatCount,
